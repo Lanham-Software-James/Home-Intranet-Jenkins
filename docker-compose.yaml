@@ -1,0 +1,26 @@
+services:
+  jenkins:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: jenkins
+    privileged: true
+    user: root
+    ports:
+      - 8081:8080
+      - 50000:50000
+    volumes:
+      - /opt/stacks/jenkins/jenkins_configuration:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: unless-stopped
+
+  agent:
+    image: jenkins/ssh-agent:jdk11
+    container_name: jenkins-agent
+    privileged: true
+    user: root
+    expose:
+      - 22
+    environment:
+      - JENKINS_AGENT_SSH_PUBKEY=${PUBLIC_KEY}
+    restart: unless-stopped
