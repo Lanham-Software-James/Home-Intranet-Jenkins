@@ -1,8 +1,6 @@
 services:
   jenkins:
-    build: 
-      context: .
-      dockerfile: Dockerfile
+    image: jameslanham/home-intranet-jenkins:latest
     container_name: jenkins
     privileged: true
     user: root
