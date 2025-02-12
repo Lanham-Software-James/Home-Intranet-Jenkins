@@ -22,7 +22,7 @@ jobs:
     - name: Build and push jenkins image
       uses: docker/build-push-action@v4
       with:
-        context: ./Jenkins
+        context: .
         push: true
         tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/home-intranet-jenkins:latest
