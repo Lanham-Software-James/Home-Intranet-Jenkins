@@ -1,28 +1,38 @@
 services:
   jenkins:
     image: jameslanham/home-intranet-jenkins:latest
-    container_name: jenkins
+    container_name: home-intranet-jenkins
     privileged: true
     user: root
     ports:
-      - 8081:8080
       - 50000:50000
     networks:
       - home-intranet-nginx
+      - home-intranet-jenkins
     environment:
       VIRTUAL_HOST: "jenkins.homeintranet.local"
+      VIRTUAL_PROTO: "http"
+      VIRTUAL_PORT: 8080
     volumes:
-      - /opt/stacks/jenkins/jenkins_configuration:/var/jenkins_home
+      - ./jenkins_configuration:/var/jenkins_home
       - /var/run/docker.sock:/var/run/docker.sock
     restart: unless-stopped
 
   agent:
-    image: jenkins/ssh-agent:jdk11
-    container_name: jenkins-agent
+    image: jenkins/ssh-agent:jdk17
+    container_name: home-intranet-jenkins-agent
     privileged: true
     user: root
     expose:
       - 22
+    networks:
+      - home-intranet-jenkins
     environment:
       - JENKINS_AGENT_SSH_PUBKEY=${PUBLIC_KEY}
     restart: unless-stopped
+
+networks:
+  home-intranet-nginx:
+    external: true
+  home-intranet-jenkins:
+    driver: bridge
