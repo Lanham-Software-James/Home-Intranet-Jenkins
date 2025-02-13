@@ -10,7 +10,7 @@ services:
       - home-intranet-nginx
       - home-intranet-jenkins
     environment:
-      VIRTUAL_HOST: "jenkins.homeintranet.local"
+      VIRTUAL_HOST: "jenkins.intranet.local"
       VIRTUAL_PROTO: "http"
       VIRTUAL_PORT: 8080
     volumes:
