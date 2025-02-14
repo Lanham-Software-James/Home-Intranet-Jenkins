@@ -1,14 +1,14 @@
 services:
   jenkins:
     image: jameslanham/home-intranet-jenkins:latest
-    container_name: home-intranet-jenkins
+    container_name: jenkins
     privileged: true
     user: root
     ports:
       - 50000:50000
     networks:
       - home-intranet-nginx
-      - home-intranet-jenkins
+      - jenkins
     environment:
       VIRTUAL_HOST: "jenkins.intranet.local"
       VIRTUAL_PROTO: "http"
@@ -20,13 +20,13 @@ services:
 
   agent:
     image: jenkins/ssh-agent:jdk17
-    container_name: home-intranet-jenkins-agent
+    container_name: jenkins-agent
     privileged: true
     user: root
     expose:
       - 22
     networks:
-      - home-intranet-jenkins
+      - jenkins
     environment:
       - JENKINS_AGENT_SSH_PUBKEY=${PUBLIC_KEY}
     restart: unless-stopped
@@ -34,5 +34,5 @@ services:
 networks:
   home-intranet-nginx:
     external: true
-  home-intranet-jenkins:
+  jenkins:
     driver: bridge
