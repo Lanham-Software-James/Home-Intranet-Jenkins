@@ -3,6 +3,8 @@ name: Build and Push Jenkins Docker Image
 on:
     push:
       branches: [ master ]
+      paths:
+        - 'Dockerfile'
 
 jobs:
   build-and-push:
