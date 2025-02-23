@@ -1,38 +1,55 @@
 services:
+  jenkins-tailscale:
+    image: tailscale/tailscale:latest
+    container_name: jenkins-tailscale
+    hostname: jenkins
+    healthcheck:
+      test: ["CMD", "tailscale", "status", "--peers=false"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    environment:
+      - TS_AUTHKEY=${TAILSCALE_OAUTH_KEY}
+      - "TS_EXTRA_ARGS=--advertise-tags=tag:intranet --reset"
+      - TS_STATE_DIR=/var/lib/tailscale
+      - TS_USERSPACE=false
+      - TS_SERVE_CONFIG=jenkins.json
+      - TS_ACCEPT_DNS=true
+    volumes:
+      - jenkins-tailscale:/var/lib/tailscale
+      - ./jenkins.json:/jenkins.json
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    cap_add:
+      - net_admin
+      - sys_module
+    restart: unless-stopped
+
   jenkins:
     image: jameslanham/home-intranet-jenkins:latest
     container_name: jenkins
+    network_mode: service:jenkins-tailscale
     privileged: true
     user: root
-    ports:
-      - 50000:50000
-    networks:
-      - home-intranet-nginx
-      - jenkins
-    environment:
-      VIRTUAL_HOST: "jenkins.intranet.local"
-      VIRTUAL_PROTO: "http"
-      VIRTUAL_PORT: 8080
     volumes:
       - ./jenkins_configuration:/var/jenkins_home
       - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      jenkins-tailscale:
+        condition: service_healthy
     restart: unless-stopped
 
   agent:
     image: jenkins/ssh-agent:jdk17
     container_name: jenkins-agent
+    network_mode: service:jenkins
     privileged: true
     user: root
-    expose:
-      - 22
-    networks:
-      - jenkins
     environment:
       - JENKINS_AGENT_SSH_PUBKEY=${PUBLIC_KEY}
+    depends_on:
+      - jenkins
     restart: unless-stopped
 
-networks:
-  home-intranet-nginx:
-    external: true
-  jenkins:
-    driver: bridge
+volumes:
+  jenkins-tailscale:
