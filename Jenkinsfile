@@ -1,7 +1,8 @@
 pipeline {
     agent any
     environment {
-        SERVER_IP = '192.168.0.39'
+        USER = 'jenkins'
+        SERVER_IP = 'homeintranet'
         DEPLOY_DIR = '/opt/stacks/jenkins'
         CREDENTIALS_ID = 'home-intranet-server-ssh'
     }
@@ -16,7 +17,7 @@ pipeline {
         stage('Copy Files to Server') {
             steps {
                 sshagent(credentials: [CREDENTIALS_ID]) {
-                    sh "scp -o StrictHostKeyChecking=no docker-compose.yml ${SERVER_IP}:${DEPLOY_DIR}/docker-compose.yml"
+                    sh "scp -o StrictHostKeyChecking=no docker-compose.yml ${USER}@${SERVER_IP}:${DEPLOY_DIR}/docker-compose.yml"
                 }
             }
         }
