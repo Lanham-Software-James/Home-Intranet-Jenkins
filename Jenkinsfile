@@ -2,7 +2,7 @@ pipeline {
     agent any
     environment {
         USER = 'jenkins'
-        SERVER_IP = 'homeintranet'
+        SERVER_IP = 'home-intranet'
         DEPLOY_DIR = '/opt/stacks/jenkins'
         CREDENTIALS_ID = 'home-intranet-server-ssh'
     }
